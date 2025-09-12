@@ -2,9 +2,9 @@
 
 import { cookies } from 'next/headers'
 import { BASE_URL, AdminRoutes_API, apiConnector } from "@/lib/services/apis";
-import { AdminLoginFormFields } from '@/app/(root)/en/admin/login/page';
 
-export const loginAdmin = async (values: AdminLoginFormFields) => {
+
+export const loginAdmin = async (values:any) => {
     try {
         const API = BASE_URL + AdminRoutes_API.loginAdmin;
         const res = await apiConnector({
