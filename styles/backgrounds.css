@@ -1,0 +1,30 @@
+.contactpage_bg::before {
+    content: "";
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 1;
+    background-image: url("/images/HeroSection/1.jpg");
+
+}
+
+.contactpage_bg::after {
+    content: "";
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    opacity: 0.8;
+    background: #cdeeff;
+    /* background: -webkit-linear-gradient(to right, #0a51c4, #373B44); */
+    /* background: linear-gradient(to right, #0a51c4, #373B44); */
+}

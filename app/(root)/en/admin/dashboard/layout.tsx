@@ -1,10 +1,11 @@
+"use client"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { validateAdmin } from '@/lib/actions/AdminActions/validateAdmin';
 import Sidebar from '@/components/AdminPanel/Sidebar/Sidebar';
 import LogoutButton from '@/components/AdminPanel/LogoutButton/LogoutButton';
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
