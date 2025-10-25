@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { apiConnector, BASE_URL } from '../../lib/services/apis';
+import { authApiService } from '../../lib/services/auth-api';
 
 interface User {
     id: string;
@@ -25,44 +25,23 @@ export default function TokenVerification() {
     const [error, setError] = useState<string | null>(null);
     const [tokenStatus, setTokenStatus] = useState<'checking' | 'valid' | 'invalid' | 'none'>('checking');
 
-    // Check for token in cookies
-    const getTokenFromCookies = () => {
-        if (typeof document === 'undefined') return null;
 
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === 'token' || name === 'auth_token') {
-                return value;
-            }
-        }
-        return null;
-    };
-
-    // Verify token with backend
+    // Verify token with backend (same as auth app)
     const verifyToken = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const token = getTokenFromCookies();
+            console.log('🔍 Verifying token with backend (same as auth app)...');
 
-            if (!token) {
+            const response = await authApiService.checkToken();
+
+            if (response.error) {
                 setTokenStatus('none');
-                setError('No authentication token found in cookies');
+                setError(response.error);
+                console.log('❌ Token verification failed:', response.error);
                 return;
             }
-
-            console.log('🔍 Verifying token with backend...');
-
-            const response = await apiConnector({
-                method: 'GET',
-                url: `${BASE_URL}/api/v1/auth/check-token`,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
 
             if (response.data && response.data.isValid) {
                 setUser(response.data.user);
@@ -71,11 +50,12 @@ export default function TokenVerification() {
             } else {
                 setTokenStatus('invalid');
                 setError('Token is invalid or expired');
+                console.log('❌ Token validation failed');
             }
         } catch (err: any) {
             console.error('❌ Token verification failed:', err);
             setTokenStatus('invalid');
-            setError(err.response?.data?.message || err.message || 'Token verification failed');
+            setError(err.message || 'Token verification failed');
         } finally {
             setIsLoading(false);
         }
@@ -176,6 +156,21 @@ export default function TokenVerification() {
                         </button>
                     )}
 
+                    {/* Debug: Manual Token Setting */}
+                    <button
+                        onClick={() => {
+                            const testToken = prompt('Enter test token (for debugging):');
+                            if (testToken) {
+                                document.cookie = `token=${testToken}; path=/; max-age=86400; samesite=lax`;
+                                console.log('🍪 Test token set manually');
+                                verifyToken();
+                            }
+                        }}
+                        className="w-full bg-yellow-600 text-white py-2 rounded-lg font-medium hover:bg-yellow-700 transition text-sm"
+                    >
+                        🧪 Set Test Token (Debug)
+                    </button>
+
                     {tokenStatus === 'valid' && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                             <h3 className="font-medium text-green-800 mb-1">🎉 Success!</h3>
@@ -190,10 +185,10 @@ export default function TokenVerification() {
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                     <h3 className="font-medium text-gray-900 mb-2 text-sm">Debug Info:</h3>
                     <div className="text-xs text-gray-600 space-y-1">
-                        <p>Backend URL: {BASE_URL}</p>
+                        <p>Backend URL: {authApiService.getBaseURL()}</p>
                         <p>Token Status: {tokenStatus}</p>
-                        <p>Has Token: {getTokenFromCookies() ? 'Yes' : 'No'}</p>
-                        <p>Cookies: {document.cookie || 'None'}</p>
+                        <p>Has Token: {authApiService.hasToken() ? 'Yes' : 'No'}</p>
+                        <p>Cookies: {typeof document !== 'undefined' ? document.cookie || 'None' : 'SSR'}</p>
                     </div>
                 </div>
             </div>
