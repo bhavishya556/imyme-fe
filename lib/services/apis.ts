@@ -4,7 +4,9 @@ import axios from "axios"
 export const BASE_URL = 'http://localhost:5000'
 
 
-export const axiosInstance = axios.create({});
+export const axiosInstance = axios.create({
+    withCredentials: true, // Include cookies in requests
+});
 
 export const apiConnector = ({ method, url, bodyData, headers }: any) => {
     return axiosInstance({

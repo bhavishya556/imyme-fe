@@ -35,27 +35,18 @@ class AuthApiService {
         return this.baseURL;
     }
 
-    // Check Token - same as auth app
+    // Check Token - cookies are sent automatically by browser
     async checkToken(): Promise<ApiResponse<TokenResponse>> {
         console.log('🔍 Checking token authentication (main app)...');
         console.log('🌐 Base URL:', this.baseURL);
+        console.log('🍪 Cookies will be sent automatically by browser');
 
         try {
-            // Get token from cookies
-            const token = this.getTokenFromCookies();
-            console.log('🍪 Token from cookies:', token ? `${token.slice(0, 8)}...${token.slice(-8)}` : 'missing');
-
-            if (!token) {
-                return {
-                    error: 'No authentication token found in cookies'
-                };
-            }
-
+            // No need to manually get token - browser sends cookies automatically
             const response = await apiConnector({
                 method: 'GET',
                 url: `${this.baseURL}/api/v1/auth/check-token`,
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -77,30 +68,11 @@ class AuthApiService {
         }
     }
 
-    // Get token from cookies (same logic as auth app)
-    private getTokenFromCookies(): string | null {
-        if (typeof document === 'undefined') return null;
 
-        console.log('🍪 All cookies:', document.cookie);
-        console.log('🍪 Current hostname:', window.location.hostname);
-        console.log('🍪 Current domain:', window.location.hostname.split('.').slice(-2).join('.'));
-
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            console.log('🍪 Checking cookie:', name, '=', value ? 'present' : 'empty');
-            if (name === 'token' || name === 'auth_token') {
-                console.log('🍪 Found token cookie:', name);
-                return value;
-            }
-        }
-        console.log('🍪 No token cookies found');
-        return null;
-    }
-
-    // Check if token exists
+    // Check if token exists (cookies are handled by browser)
     hasToken(): boolean {
-        return !!this.getTokenFromCookies();
+        if (typeof document === 'undefined') return false;
+        return document.cookie.includes('token=');
     }
 
 }
