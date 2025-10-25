@@ -171,6 +171,19 @@ export default function TokenVerification() {
                         🧪 Set Test Token (Debug)
                     </button>
 
+                    {/* Debug: Set Test Token with Domain */}
+                    <button
+                        onClick={() => {
+                            console.log('🧪 Setting test token with .onrender.com domain...');
+                            authApiService.setTestToken();
+                            alert('🧪 Test token with domain set! Check console for details.');
+                            verifyToken();
+                        }}
+                        className="w-full bg-orange-600 text-white py-2 rounded-lg font-medium hover:bg-orange-700 transition text-sm"
+                    >
+                        🧪 Set Test Token with Domain (Debug)
+                    </button>
+
                     {tokenStatus === 'valid' && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                             <h3 className="font-medium text-green-800 mb-1">🎉 Success!</h3>

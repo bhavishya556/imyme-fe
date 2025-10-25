@@ -82,10 +82,13 @@ class AuthApiService {
         if (typeof document === 'undefined') return null;
 
         console.log('🍪 All cookies:', document.cookie);
+        console.log('🍪 Current hostname:', window.location.hostname);
+        console.log('🍪 Current domain:', window.location.hostname.split('.').slice(-2).join('.'));
 
         const cookies = document.cookie.split(';');
         for (let cookie of cookies) {
             const [name, value] = cookie.trim().split('=');
+            console.log('🍪 Checking cookie:', name, '=', value ? 'present' : 'empty');
             if (name === 'token' || name === 'auth_token') {
                 console.log('🍪 Found token cookie:', name);
                 return value;
@@ -98,6 +101,17 @@ class AuthApiService {
     // Check if token exists
     hasToken(): boolean {
         return !!this.getTokenFromCookies();
+    }
+
+    // Debug method to manually set a test token
+    setTestToken(): void {
+        const testToken = 'test-token-main-' + Date.now();
+        console.log('🧪 Setting test token in main app:', testToken);
+
+        // Set cookie with .onrender.com domain for cross-subdomain access
+        document.cookie = `token=${testToken}; domain=.onrender.com; path=/; max-age=86400; samesite=lax; secure=true`;
+        console.log('🍪 Test token set with .onrender.com domain');
+        console.log('🍪 All cookies after setting:', document.cookie);
     }
 }
 
