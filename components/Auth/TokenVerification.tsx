@@ -156,33 +156,6 @@ export default function TokenVerification() {
                         </button>
                     )}
 
-                    {/* Debug: Manual Token Setting */}
-                    <button
-                        onClick={() => {
-                            const testToken = prompt('Enter test token (for debugging):');
-                            if (testToken) {
-                                document.cookie = `token=${testToken}; path=/; max-age=86400; samesite=lax`;
-                                console.log('🍪 Test token set manually');
-                                verifyToken();
-                            }
-                        }}
-                        className="w-full bg-yellow-600 text-white py-2 rounded-lg font-medium hover:bg-yellow-700 transition text-sm"
-                    >
-                        🧪 Set Test Token (Debug)
-                    </button>
-
-                    {/* Debug: Set Test Token with Domain */}
-                    <button
-                        onClick={() => {
-                            console.log('🧪 Setting test token with .onrender.com domain...');
-                            authApiService.setTestToken();
-                            alert('🧪 Test token with domain set! Check console for details.');
-                            verifyToken();
-                        }}
-                        className="w-full bg-orange-600 text-white py-2 rounded-lg font-medium hover:bg-orange-700 transition text-sm"
-                    >
-                        🧪 Set Test Token with Domain (Debug)
-                    </button>
 
                     {tokenStatus === 'valid' && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">

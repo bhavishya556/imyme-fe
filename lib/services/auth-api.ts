@@ -103,16 +103,6 @@ class AuthApiService {
         return !!this.getTokenFromCookies();
     }
 
-    // Debug method to manually set a test token
-    setTestToken(): void {
-        const testToken = 'test-token-main-' + Date.now();
-        console.log('🧪 Setting test token in main app:', testToken);
-
-        // Set cookie with .onrender.com domain for cross-subdomain access
-        document.cookie = `token=${testToken}; domain=.onrender.com; path=/; max-age=86400; samesite=lax; secure=true`;
-        console.log('🍪 Test token set with .onrender.com domain');
-        console.log('🍪 All cookies after setting:', document.cookie);
-    }
 }
 
 // Export singleton instance
