@@ -70,11 +70,6 @@ export default function TokenVerification() {
         verifyToken();
     };
 
-    const handleRedirectToAuth = () => {
-        const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || 'http://localhost:3001';
-        console.log('🔄 Redirecting to auth frontend:', authUrl);
-        window.location.href = authUrl;
-    };
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -147,15 +142,7 @@ export default function TokenVerification() {
                         {isLoading ? '🔄 Verifying...' : '🔍 Recheck Token'}
                     </button>
 
-                    {tokenStatus !== 'valid' && (
-                        <button
-                            onClick={handleRedirectToAuth}
-                            className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition"
-                        >
-                            🔐 Go to Authentication
-                        </button>
-                    )}
-
+            
 
                     {tokenStatus === 'valid' && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
