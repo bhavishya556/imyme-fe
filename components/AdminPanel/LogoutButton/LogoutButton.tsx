@@ -1,15 +1,12 @@
 "use client"
 import { IoMdLogOut } from "react-icons/io";
 import { useRouter } from 'next/navigation'
-import { logoutAdmin } from '@/lib/actions/AdminActions/logoutAdmin';
+
 
 const LogoutButton =  () => {
     const router = useRouter()
     const handleClick = async( ) => {
-        const res = await logoutAdmin();
-        if(res){
-            router.push('/en/admin/login')
-        }
+     
     }
 
     return (
