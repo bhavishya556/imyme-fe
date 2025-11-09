@@ -16,6 +16,6 @@ export default function Subdomain() {
   }, []);
 
   return (
-    <h1 className='bg-green-500'>{subdomain ? `Subdomain: ${subdomain}` : 'No subdomain detected'}</h1>
+    <h1 className='text-red-500'>{subdomain ? `Subdomain: ${subdomain}` : 'No subdomain detected'}</h1>
   );
 }

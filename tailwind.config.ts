@@ -1,12 +1,8 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
+import type { Config } from "tailwindcss";
+// @ts-ignore - Internal Tailwind utility
+const flattenColorPalette = require("tailwindcss/lib/util/flattenColorPalette").default;
 
-const colors = require("tailwindcss/colors");
-const {
-  default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
-import type { Config } from "tailwindcss"
-
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx,js,jsx}',
