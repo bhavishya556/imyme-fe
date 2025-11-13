@@ -1,5 +1,6 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./globals.css";
+import Nav from "@/components/Nav/Nav";
 
 // export const metadata = {
 //   title: 'imyme',
@@ -15,6 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
         <body>
+          <Nav />
           {children}
         </body>
       </GoogleOAuthProvider>

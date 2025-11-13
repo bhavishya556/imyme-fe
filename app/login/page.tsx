@@ -25,7 +25,7 @@ const LoginPage = () => {
                 const { user } = response.data;
                 setUser(user as unknown as IUser);
                 // Redirect to dashboard or main page after successful login
-               // window.location.href = "/my-webs";
+                // window.location.href = "/my-webs";
             }
         } catch (error) {
             console.error("Error fetching user info:", error);
@@ -73,7 +73,7 @@ const LoginPage = () => {
         }
     };
 
-    // Handle email/password login (basic implementation)
+    // Handle email/password login
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !password) {
@@ -83,12 +83,20 @@ const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            // This would be your email/password login API call
-            // For now, just show an alert
-            alert("Email/password login not implemented yet. Please use Google login for testing.");
+            const response = await apiService.emailLogin(email, password);
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+            if (response.data) {
+                const { user } = response.data;
+                setUser(user as unknown as IUser);
+                // Redirect to dashboard or main page after successful login
+                window.location.href = "/my-webs";
+            }
         } catch (error) {
             console.error("Email login failed:", error);
-            alert("Login failed. Please try again.");
+            alert("Login failed. Please check your email and password.");
         } finally {
             setIsLoading(false);
         }

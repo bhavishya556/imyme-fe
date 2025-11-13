@@ -1,6 +1,5 @@
 
 import axios from "axios"
-import { cookies } from "next/headers"
 // Types
 export interface IOAuthTokenResponse {
     access_token: string;
@@ -39,49 +38,49 @@ export const apiClient = axios.create({
 
 
 
-    // Request interceptor to log cookie status
-    apiClient.interceptors.request.use(
+// Request interceptor to log cookie status
+apiClient.interceptors.request.use(
     (config) => {
 
-       const cookiesForLocal = document.cookie;
+        const cookiesForLocal = document.cookie;
 
-      console.log('Request:', {
-        method: config.method?.toUpperCase(),
-        url: config.url,
-        hasCookies: document.cookie.includes('token='),
-        cookies: cookiesForLocal || 'none'
-      });
+        console.log('Request:', {
+            method: config.method?.toUpperCase(),
+            url: config.url,
+            hasCookies: document.cookie.includes('token='),
+            cookies: cookiesForLocal || 'none'
+        });
 
-      if (cookiesForLocal) {
-        config.headers.Authorization = `Bearer ${cookiesForLocal}`;
-      }
-      return config;
+        if (cookiesForLocal) {
+            config.headers.Authorization = `Bearer ${cookiesForLocal}`;
+        }
+        return config;
     },
     (error) => {
-      console.error('Request error:', error);
-      return Promise.reject(error);
+        console.error('Request error:', error);
+        return Promise.reject(error);
     }
-  );
-  
-  // Response interceptor to log results
-  apiClient.interceptors.response.use(
+);
+
+// Response interceptor to log results
+apiClient.interceptors.response.use(
     (response) => {
-      console.log('📥 API Response:', {
-        status: response.status,
-        url: response.config.url,
-        data: response.data
-      });
-      return response;
+        console.log('📥 API Response:', {
+            status: response.status,
+            url: response.config.url,
+            data: response.data
+        });
+        return response;
     },
     (error) => {
-      console.error('Response error:', {
-        status: error.response?.status,
-        message: error.message,
-        url: error.config?.url
-      });
-      return Promise.reject(error);
+        console.error('Response error:', {
+            status: error.response?.status,
+            message: error.message,
+            url: error.config?.url
+        });
+        return Promise.reject(error);
     }
-  );
+);
 
 
 
@@ -113,12 +112,12 @@ class ApiService {
             const response = await apiClient.post('/api/v1/auth/google', {
                 access_token: accessToken
             });
-
+            // ONLY FOR LOCAL DEVELOPMENT
             const localToken = response.data.token;
             const oneDay = 24 * 60 * 60; // seconds
             document.cookie = `token=${localToken}; path=/; max-age=${oneDay}`;
 
-           
+
             return {
                 data: { user: response.data.user },
                 message: 'Google authentication successful'
@@ -175,13 +174,17 @@ class ApiService {
         }
     }
 
-    // Email/Password Login (placeholder for future implementation)
+    // Email/Password Login
     async emailLogin(email: string, password: string): Promise<ApiResponse<{ user: IUser }>> {
         try {
-            const response = await apiClient.post('/api/v1/auth/email', {
+            const response = await apiClient.post('/api/v1/auth/login', {
                 email,
                 password
             });
+            // ONLY FOR LOCAL DEVELOPMENT
+            const localToken = response.data.token;
+            const oneDay = 24 * 60 * 60; // seconds
+            document.cookie = `token=${localToken}; path=/; max-age=${oneDay}`;
             return {
                 data: { user: response.data.user },
                 message: 'Email authentication successful'
@@ -191,6 +194,70 @@ class ApiService {
             const errorMessage = error instanceof Error
                 ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || error.message
                 : 'Email authentication failed';
+            return {
+                error: errorMessage
+            };
+        }
+    }
+
+    // Email/Password Registration
+    async emailRegister(email: string, password: string, name: string): Promise<ApiResponse<{ user: IUser }>> {
+        try {
+            const response = await apiClient.post('/api/v1/auth/register', {
+                email,
+                password,
+                name
+            });
+            return {
+                data: { user: response.data.user },
+                message: 'Registration successful'
+            };
+        } catch (error: unknown) {
+            console.error('Email registration failed:', error);
+            const errorMessage = error instanceof Error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || error.message
+                : 'Registration failed';
+            return {
+                error: errorMessage
+            };
+        }
+    }
+
+    // Web APIs
+    async createWeb(name: string, content: string, domain: string): Promise<ApiResponse<any>> {
+        try {
+            const response = await apiClient.post('/api/v1/web', {
+                name,
+                content,
+                domain
+            });
+            return {
+                data: response.data,
+                message: 'Web created successfully'
+            };
+        } catch (error: unknown) {
+            console.error('Create web failed:', error);
+            const errorMessage = error instanceof Error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || error.message
+                : 'Failed to create web';
+            return {
+                error: errorMessage
+            };
+        }
+    }
+
+    async getUserWebs(): Promise<ApiResponse<any[]>> {
+        try {
+            const response = await apiClient.get('/api/v1/web');
+            return {
+                data: response.data?.data || response.data || [],
+                message: 'Webs fetched successfully'
+            };
+        } catch (error: unknown) {
+            console.error('Get webs failed:', error);
+            const errorMessage = error instanceof Error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || error.message
+                : 'Failed to fetch webs';
             return {
                 error: errorMessage
             };
