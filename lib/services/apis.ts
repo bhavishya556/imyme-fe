@@ -28,10 +28,10 @@ export interface ApiResponse<T = unknown> {
     message?: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URI || 'http://localhost:3000'
+const BASE_BACKEND_URL = process.env.NEXT_PUBLIC_BASE_URI || 'http://localhost:3000'
 
 export const apiClient = axios.create({
-    baseURL: BASE_URL,
+    baseURL: BASE_BACKEND_URL,
     withCredentials: true, // Include cookies in requests
     timeout: 30000,
 });
@@ -266,5 +266,5 @@ class ApiService {
 }
 
 // Export singleton instance
-export const apiService = new ApiService(BASE_URL);
+export const apiService = new ApiService(BASE_BACKEND_URL);
 export default apiService; 
