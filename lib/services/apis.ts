@@ -28,7 +28,7 @@ export interface ApiResponse<T = unknown> {
     message?: string;
 }
 
-const BASE_BACKEND_URL = process.env.NEXT_PUBLIC_BASE_URI || 'http://localhost:3000'
+const BASE_BACKEND_URL = process.env.NEXT_BASE_BACKEND_URL || 'http://localhost:4000'
 
 export const apiClient = axios.create({
     baseURL: BASE_BACKEND_URL,
