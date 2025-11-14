@@ -1,5 +1,8 @@
 
 import axios from "axios"
+
+
+
 // Types
 export interface IOAuthTokenResponse {
     access_token: string;
@@ -28,13 +31,15 @@ export interface ApiResponse<T = unknown> {
     message?: string;
 }
 
-const BASE_BACKEND_URL = process.env.NEXT_BASE_BACKEND_URL || 'http://localhost:4000'
+const BASE_BE_URL = process.env.NEXT_PUBLIC_BASE_BACKEND_URL;
 
 export const apiClient = axios.create({
-    baseURL: BASE_BACKEND_URL,
+    baseURL: BASE_BE_URL,
     withCredentials: true, // Include cookies in requests
     timeout: 30000,
 });
+
+
 
 
 
@@ -183,8 +188,11 @@ class ApiService {
             });
             // ONLY FOR LOCAL DEVELOPMENT
             const localToken = response.data.token;
+            console.log('🚀 ~ ApiService ~ emailLogin ~ localToken:', localToken);
             const oneDay = 24 * 60 * 60; // seconds
-            document.cookie = `token=${localToken}; path=/; max-age=${oneDay}`;
+            if (localToken) {
+                document.cookie = `token=${localToken}; path=/; max-age=${oneDay}`;
+            }
             return {
                 data: { user: response.data.user },
                 message: 'Email authentication successful'
@@ -266,5 +274,5 @@ class ApiService {
 }
 
 // Export singleton instance
-export const apiService = new ApiService(BASE_BACKEND_URL);
+export const apiService = new ApiService(BASE_BE_URL || '');
 export default apiService; 

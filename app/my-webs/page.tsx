@@ -19,14 +19,15 @@ export default function Page() {
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [showForm, setShowForm] = useState(false);
-    
+
     // Form state
     const [name, setName] = useState("");
     const [content, setContent] = useState("");
     const [domain, setDomain] = useState("");
-    
+
     const router = useRouter();
     const mainFeUrl = process.env.NEXT_PUBLIC_MAIN_FE_URL || "http://localhost:3000";
+    mainFeUrl.replace('http://', '').replace('https://', '');
     // Fetch all webs for the user
     const fetchWebs = async () => {
         setLoading(true);
@@ -181,13 +182,21 @@ export default function Page() {
                                 {web.content}
                             </p>
                             <div className="flex gap-2">
-                            <Button
-  variant="outline"
-  size="sm"
-  onClick={() => router.push(`http://${web.domain}.${mainFeUrl}`)}
->
-  View
-</Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        const isCustomDomain = web.domain.includes('.');
+                                        const url = isCustomDomain
+                                            ? `https://${web.domain}`
+                                            : `https://${web.domain}.${mainFeUrl.replace(/^https?:\/\//, '')}`;
+
+                                        router.push(url);
+                                    }}
+
+                                >
+                                    View
+                                </Button>
 
                                 <Button variant="outline" size="sm">
                                     Edit
