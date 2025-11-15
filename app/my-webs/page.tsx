@@ -1,205 +1,102 @@
-"use client";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { getUserWebs, createWeb } from "@/lib/actions/web-action";
 import { Web } from "@/lib/types/api";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+export const dynamic = "force-dynamic"; // ensures SSR on every request
 
-
-
-export default function Page() {
-    const [webs, setWebs] = useState<Web[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [creating, setCreating] = useState(false);
-    const [showForm, setShowForm] = useState(false);
-
-    // Form state
-    const [name, setName] = useState("");
-    const [content, setContent] = useState("");
-    const [domain, setDomain] = useState("");
-
-    const router = useRouter();
-    const mainFeUrl = process.env.NEXT_PUBLIC_MAIN_FE_URL || "http://localhost:3000";
-    mainFeUrl.replace('http://', '').replace('https://', '');
-    // Fetch all webs for the user
-    const fetchWebs = async () => {
-        setLoading(true);
-        try {
-            const response = await getUserWebs();
-            if (response.error) {
-                console.error("Error fetching webs:", response.error);
-                alert("Failed to fetch webs: " + response.error);
-            } else if (response.data) {
-                setWebs(response.data);
-            }
-        } catch (error) {
-            console.error("Error fetching webs:", error);
-            alert("Failed to fetch webs");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Create new web
-    const handleCreateWeb = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!name || !content || !domain) {
-            alert("Please fill in all fields");
-            return;
-        }
-
-        setCreating(true);
-        try {
-            const response = await createWeb(name, content, domain);
-            if (response.error) {
-                alert("Failed to create web: " + response.error);
-            } else {
-                // Reset form
-                setName("");
-                setContent("");
-                setDomain("");
-                setShowForm(false);
-                // Refresh webs list
-                await fetchWebs();
-                alert("Web created successfully!");
-            }
-        } catch (error) {
-            console.error("Error creating web:", error);
-            alert("Failed to create web");
-        } finally {
-            setCreating(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchWebs();
-    }, []);
+export default async function Page() {
+    const response = await getUserWebs();
+    const webs: Web[] = response?.data || [];
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">My Webs</h1>
-                <Button
-                    onClick={() => setShowForm(!showForm)}
-                    variant={showForm ? "outline" : "default"}
+        <div className="w-full overflow-x-hidden">
+            <main className="container mx-auto px-4 py-8">
+                <h1 className="text-3xl font-bold mb-6">My Webs</h1>
+
+                {/* Create Web Form - SERVER ACTION FORM */}
+                <form
+                    action={async (formData: FormData) => {
+                        "use server";
+                        const name = formData.get("name") as string;
+                        const domain = formData.get("domain") as string;
+                        const content = formData.get("content") as string;
+
+                        await createWeb(name, content, domain);
+                    }}
+                    className="mb-10 p-6 border rounded-lg bg-white shadow-sm space-y-4"
                 >
-                    {showForm ? "Cancel" : "Create New Web"}
-                </Button>
-            </div>
+                    <h2 className="text-xl font-semibold">Create New Web</h2>
 
-            {/* Create Web Form */}
-            {showForm && (
-                <div className="mb-8 p-6 border rounded-lg bg-white shadow-sm">
-                    <h2 className="text-xl font-semibold mb-4">Create New Web</h2>
-                    <form onSubmit={handleCreateWeb} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Name</label>
-                            <Input
-                                type="text"
-                                placeholder="Enter web name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Domain</label>
-                            <Input
-                                type="text"
-                                placeholder="example.com"
-                                value={domain}
-                                onChange={(e) => setDomain(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Content</label>
-                            <textarea
-                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                placeholder="Enter web content"
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                rows={4}
-                                required
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <Button type="submit" disabled={creating}>
-                                {creating ? "Creating..." : "Create Web"}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    setShowForm(false);
-                                    setName("");
-                                    setContent("");
-                                    setDomain("");
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-            )}
+                    <input
+                        name="name"
+                        required
+                        className="border w-full p-2 rounded"
+                        placeholder="Web name"
+                    />
 
-            {/* Loading State */}
-            {loading && (
-                <div className="text-center py-8">
-                    <p className="text-gray-600">Loading webs...</p>
-                </div>
-            )}
+                    <input
+                        name="domain"
+                        required
+                        className="border w-full p-2 rounded"
+                        placeholder="example.com"
+                    />
 
-            {/* Webs List */}
-            {!loading && webs.length === 0 && (
-                <div className="text-center py-12 border rounded-lg bg-gray-50">
-                    <p className="text-gray-600 mb-4">No webs found. Create your first web!</p>
-                    <Button onClick={() => setShowForm(true)}>Create Web</Button>
-                </div>
-            )}
+                    <textarea
+                        name="content"
+                        required
+                        className="border w-full p-2 rounded min-h-[100px]"
+                        placeholder="Web content..."
+                    />
 
-            {!loading && webs.length > 0 && (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {webs.map((web) => (
+                    <Button type="submit">Create Web</Button>
+                </form>
+
+
+
+                <div className="flex flex-col gap-4">
+
+                {webs.map((web) => {
+                    const isCustomDomain = web.domain.includes(".");
+                    const host = process.env.NEXT_PUBLIC_MAIN_FE_URL?.replace(/^https?:\/\//, "") || "";
+                    const url = isCustomDomain
+                        ? `https://${web.domain}`
+                        : `https://${web.domain}.${host}`;
+
+                    return (
                         <div
                             key={web.id}
-                            className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
+                            className="p-6 border rounded-lg bg-white shadow-sm"
                         >
-                            <h3 className="text-xl font-semibold mb-2">{web.name}</h3>
+                            <h3 className="text-xl font-semibold mb-2">
+                                {web.name}
+                            </h3>
+
                             <p className="text-sm text-gray-600 mb-2">
-                                <span className="font-medium">Domain:</span> {web.domain}
+                                <strong>Domain:</strong> {web.domain}
                             </p>
-                            <p className="text-sm text-gray-700 mb-4 line-clamp-3">
+
+                            <p className="text-sm text-gray-700 line-clamp-3">
                                 {web.content}
                             </p>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                        const isCustomDomain = web.domain.includes('.');
-                                        const url = isCustomDomain
-                                            ? `https://${web.domain}`
-                                            : `https://${web.domain}.${mainFeUrl.replace(/^https?:\/\//, '')}`;
 
-                                        router.push(url);
-                                    }}
-
-                                >
-                                    View
-                                </Button>
+                            <div className="flex gap-2 mt-4">
+                                <Link href={url} target="_blank">
+                                    <Button variant="outline" size="sm">
+                                        View
+                                    </Button>
+                                </Link>
 
                                 <Button variant="outline" size="sm">
                                     Edit
                                 </Button>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
-            )}
+
+            </main>
+
         </div>
     );
 }
