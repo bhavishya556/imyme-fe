@@ -1,18 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import apiService from "@/lib/services/apis";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { getUserWebs, createWeb } from "@/lib/actions/web-action";
+import { Web } from "@/lib/types/api";
 
 
-interface Web {
-    id: string;
-    name: string;
-    content: string;
-    domain: string;
-    userId: string;
-}
 
 export default function Page() {
     const [webs, setWebs] = useState<Web[]>([]);
@@ -32,7 +26,7 @@ export default function Page() {
     const fetchWebs = async () => {
         setLoading(true);
         try {
-            const response = await apiService.getUserWebs();
+            const response = await getUserWebs();
             if (response.error) {
                 console.error("Error fetching webs:", response.error);
                 alert("Failed to fetch webs: " + response.error);
@@ -58,7 +52,7 @@ export default function Page() {
 
         setCreating(true);
         try {
-            const response = await apiService.createWeb(name, content, domain);
+            const response = await createWeb(name, content, domain);
             if (response.error) {
                 alert("Failed to create web: " + response.error);
             } else {

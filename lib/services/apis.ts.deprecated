@@ -1,0 +1,37 @@
+/**
+ * @deprecated This file is deprecated. 
+ * 
+ * Migration Guide:
+ * 
+ * 1. API URLs: Use `API_ROUTES` from `@/lib/constants/api-routes`
+ * 2. Types: Use types from `@/lib/types/api`
+ * 3. Actions: Use server actions from `@/lib/actions/auth-action` and `@/lib/actions/web-action`
+ * 4. Client-side: Use `@/lib/actions/client-auth` for browser-only operations
+ * 
+ * Examples:
+ * 
+ * OLD:
+ * ```ts
+ * import { apiService } from '@/lib/services/apis';
+ * const response = await apiService.emailLogin(email, password);
+ * ```
+ * 
+ * NEW:
+ * ```ts
+ * import { login } from '@/lib/actions/auth-action';
+ * const response = await login(email, password);
+ * ```
+ * 
+ * OLD:
+ * ```ts
+ * import apiService from '@/lib/services/apis';
+ * const response = await apiService.getUserWebs();
+ * ```
+ * 
+ * NEW:
+ * ```ts
+ * import { getUserWebs } from '@/lib/actions/web-action';
+ * const response = await getUserWebs();
+ * ```
+ */
+

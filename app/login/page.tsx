@@ -3,7 +3,8 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { apiService, IOAuthTokenResponse, IUser } from "@/lib/services/apis";
+import { IOAuthTokenResponse, IUser } from "@/lib/types/api";
+import { login, googleAuth, checkToken } from "@/lib/actions/auth-action";
 
 const LoginPage = () => {
     const [user, setUser] = useState<IUser | null>(null);
@@ -16,7 +17,7 @@ const LoginPage = () => {
     const sendGoogleTokenToBackend = async (accessToken: string) => {
         try {
             setIsLoading(true);
-            const response = await apiService.googleAuth(accessToken);
+            const response = await googleAuth(accessToken);
 
             if (response.error) {
                 throw new Error(response.error);
@@ -25,7 +26,7 @@ const LoginPage = () => {
                 const { user } = response.data;
                 setUser(user as unknown as IUser);
                 // Redirect to dashboard or main page after successful login
-                // window.location.href = "/my-webs";
+                window.location.href = "/my-webs";
             }
         } catch (error) {
             console.error("Error fetching user info:", error);
@@ -54,7 +55,7 @@ const LoginPage = () => {
     const checkAuth = async () => {
         setIsCheckingAuth(true);
         try {
-            const response = await apiService.checkToken();
+            const response = await checkToken();
 
             if (response.error) {
                 throw new Error(response.error);
@@ -83,7 +84,8 @@ const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            const response = await apiService.emailLogin(email, password);
+            const response = await login(email, password);
+            console.log('🚀 ~ handleEmailLogin ~ response:', response);
 
             if (response.error) {
                 throw new Error(response.error);
@@ -117,7 +119,6 @@ const LoginPage = () => {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
@@ -220,3 +221,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
